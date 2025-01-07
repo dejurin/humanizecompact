@@ -5,11 +5,15 @@ import (
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/en"
+	"golang.org/x/text/language"
 )
 
 func main() {
+    var locales = map[string]hc.Locale{
+        "en": locale.Data,
+    }
     humanizer := hc.New(
-        locale.Data, 
+        locales,
         hc.Long,
         func(original string) string {
             return original
@@ -19,7 +23,7 @@ func main() {
     values := []string{"999", "1000", "10000", "1500000", "0.75", "1000000000000"}
 
     for _, val := range values {
-        out, err := humanizer.Humanize(val)
+        out, err := humanizer.Humanize(val, language.English)
         if err != nil {
             fmt.Printf("[ERROR] val=%q: %v\n", val, err)
             continue

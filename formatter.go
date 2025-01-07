@@ -70,110 +70,116 @@ func (e InvalidNumberError) Error() string {
 // more human-friendly representation (e.g., "1K") according to its
 // configured Locale, Option, and fallback strategy.
 type Humanizer struct {
-	locale   Locale
-	opt      Option
-	fallback FallbackFunc
+    locales  map[string]Locale
+    opt      Option
+    fallback FallbackFunc
 }
 
 // New returns a pointer to a new Humanizer with the given locale,
 // form option (long or short), and fallback function. The fallback
 // function is called whenever the input string cannot be
 // humanized (e.g., non-integer or missing CLDR data).
-func New(loc Locale, opt Option, fb FallbackFunc) *Humanizer {
-	return &Humanizer{
-		locale:   loc,
-		opt:      opt,
-		fallback: fb,
-	}
+func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
+    return &Humanizer{
+        locales:  locales,
+        opt:      opt,
+        fallback: fb,
+    }
 }
 
 // Humanize attempts to produce a locale-appropriate, human-friendly
 // version of the given numeric string. If the string cannot be parsed
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
-func (h *Humanizer) Humanize(value string) (string, error) {
-	valDec, err := decimal.Parse(value)
-	if err != nil {
-		return "", InvalidNumberError{Value: value, Err: err}
-	}
-	if !valDec.IsInt() {
-		return h.fallback(value), nil
-	}
+func (h *Humanizer) Humanize(value string, locale language.Tag) (string, error) {
+    locCode := locale.String()
+    loc, exists := h.locales[locCode]
+    if !exists {
+        return "", fmt.Errorf("locale %q not found", locCode)
+    }
 
-	var df map[string]string
-	if h.opt == Long {
-		df = h.locale.Data().Long.DecimalFormat
-	} else {
-		df = h.locale.Data().Short.DecimalFormat
-	}
-	if len(df) == 0 {
-		return h.fallback(value), nil
-	}
+    valDec, err := decimal.Parse(value)
+    if err != nil {
+        return "", InvalidNumberError{Value: value, Err: err}
+    }
+    if !valDec.IsInt() {
+        return h.fallback(value), nil
+    }
 
-	groupScales := parseGroupScales(df)
-	if len(groupScales) == 0 {
-		return h.fallback(value), nil
-	}
+    var df map[string]string
+    if h.opt == Long {
+        df = loc.Data().Long.DecimalFormat
+    } else {
+        df = loc.Data().Short.DecimalFormat
+    }
+    if len(df) == 0 {
+        return h.fallback(value), nil
+    }
 
-	sortedScales := sortGroupScales(groupScales)
+    groupScales := parseGroupScales(df)
+    if len(groupScales) == 0 {
+        return h.fallback(value), nil
+    }
 
-	// Pre-create decimals for simple comparisons.
-	one, _ := decimal.New(1, 0)
-	thousand, _ := decimal.New(1000, 0)
+    sortedScales := sortGroupScales(groupScales)
 
-	var best groupScale
-	var bestRatio decimal.Decimal
+    one, _ := decimal.New(1, 0)
+    thousand, _ := decimal.New(1000, 0)
 
-	for _, gs := range sortedScales {
-		scaleDec, _ := decimal.New(gs.scale, 0)
-		if valDec.Cmp(scaleDec) >= 0 {
-			ratio, divErr := valDec.Quo(scaleDec)
-			if divErr != nil {
-				continue
-			}
-			if ratio.Cmp(one) < 0 {
-				continue
-			}
-			if ratio.Cmp(thousand) > 0 {
-				continue
-			}
-			if !has0or1DecimalExactly(ratio, h.locale.Code()) {
-				continue
-			}
-			if !isAllowedRatio(ratio) {
-				continue
-			}
-			if bestRatio.IsZero() || ratio.Cmp(bestRatio) == -1 {
-				best = gs
-				bestRatio = ratio
-			}
-		}
-	}
+    var best groupScale
+    var bestRatio decimal.Decimal
 
-	if bestRatio.IsZero() {
-		return h.fallback(value), nil
-	}
+    for _, gs := range sortedScales {
+        scaleDec, _ := decimal.New(gs.scale, 0)
+        if valDec.Cmp(scaleDec) >= 0 {
+            ratio, divErr := valDec.Quo(scaleDec)
+            if divErr != nil {
+                continue
+            }
+            if ratio.Cmp(one) < 0 {
+                continue
+            }
+            if ratio.Cmp(thousand) > 0 {
+                continue
+            }
+            if !has0or1DecimalExactly(ratio, loc.Code()) {
+                continue
+            }
+            if !isAllowedRatio(ratio) {
+                continue
+            }
+            if bestRatio.IsZero() || ratio.Cmp(bestRatio) == -1 {
+                best = gs
+                bestRatio = ratio
+            }
+        }
+    }
 
-	pluralForm := h.locale.PluralForm(bestRatio, value)
-	key := fmt.Sprintf("%d-count-%s", best.scale, pluralForm)
-	tmpl := df[key]
+    if bestRatio.IsZero() {
+        return h.fallback(value), nil
+    }
 
-	// Fallback to "other" form if needed.
-	if tmpl == "" && pluralForm != "other" {
-		altKey := fmt.Sprintf("%d-count-other", best.scale)
-		altTmpl := df[altKey]
-		if altTmpl != "" {
-			tmpl = altTmpl
-		}
-	}
+    pluralForm := loc.PluralForm(bestRatio, value)
+    key := fmt.Sprintf("%d-count-%s", best.scale, pluralForm)
+    tmpl := df[key]
 
-	tag := language.MustParse(h.locale.Code())
-	p := message.NewPrinter(tag)
-	floatVal, _ := bestRatio.Float64()
+    if tmpl == "" && pluralForm != "other" {
+        altKey := fmt.Sprintf("%d-count-other", best.scale)
+        altTmpl := df[altKey]
+        if altTmpl != "" {
+            tmpl = altTmpl
+        }
+    }
 
-	return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), nil
+    if tmpl == "" {
+        return h.fallback(value), nil
+    }
+
+    p := message.NewPrinter(locale)
+    floatVal, _ := bestRatio.Float64()
+
+    return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), nil
 }
-
 // groupScale is an internal struct for capturing a scale name
 // (e.g. "thousand") and its integer-based scale factor (e.g. 1000).
 type groupScale struct {

@@ -5,10 +5,15 @@ import (
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/ar"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+var locales = map[string]hc.Locale{
+	"ar": locale.Data,
 }
 
 func TestHumanizeArOptionLong(t *testing.T) {
@@ -128,10 +133,10 @@ func TestHumanizeArOptionLong(t *testing.T) {
 		{"10000000000000", "١٠ ترليون"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Arabic)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -190,10 +195,10 @@ func TestHumanizeArOptionShort(t *testing.T) {
 		{"2000000000", "٢ مليار"},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Arabic)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

@@ -5,10 +5,15 @@ import (
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/da"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+var locales = map[string]hc.Locale{
+	"da": locale.Data,
 }
 
 func TestHumanizeDaOptionLong(t *testing.T) {
@@ -130,10 +135,10 @@ func TestHumanizeDaOptionLong(t *testing.T) {
 		{"10000000000000", "10 billioner"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Danish)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -179,7 +184,6 @@ func TestHumanizeDaOptionShort(t *testing.T) {
 		{"1500000000", "1,5 mia."},
 		{"1600000000", "1,6 mia."},
 		{"1700000000", "1,7 mia."},
-
 		{"1000000000000", "1 bio."},
 		{"1100000000000", "1,1 bio."},
 		{"1200000000000", "1,2 bio."},
@@ -193,10 +197,10 @@ func TestHumanizeDaOptionShort(t *testing.T) {
 		{"2000000000000", "2 bio."},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Danish)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

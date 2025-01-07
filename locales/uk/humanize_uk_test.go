@@ -5,10 +5,16 @@ import (
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/uk"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+
+var locales = map[string]hc.Locale{
+	"uk": locale.Data,
 }
 
 func TestHumanizeUkOptionLong(t *testing.T) {
@@ -22,44 +28,37 @@ func TestHumanizeUkOptionLong(t *testing.T) {
 		{"4000", "4 тисячі"},
 		{"5000", "5 тисяч"},
 		{"99900", "99,9 тисячі"},
-
 		{"1000000", "1 мільйон"},
 		{"2000000", "2 мільйони"},
 		{"3000000", "3 мільйони"},
 		{"4000000", "4 мільйони"},
 		{"5000000", "5 мільйонів"},
-
 		{"1000000000", "1 мільярд"},
 		{"2000000000", "2 мільярди"},
 		{"3000000000", "3 мільярди"},
 		{"4000000000", "4 мільярди"},
 		{"5000000000", "5 мільярдів"},
-
 		{"1000000000000", "1 трильйон"},
 		{"2000000000000", "2 трильйони"},
 		{"3000000000000", "3 трильйони"},
 		{"4000000000000", "4 трильйони"},
 		{"5000000000000", "5 трильйонів"},
-
 		{"1100", "1,1 тисячі"},
 		{"2100", "2,1 тисячі"},
 		{"3100", "3,1 тисячі"},
 		{"4100", "4,1 тисячі"},
 		{"5100", "5,1 тисячі"},
-
 		{"1100000", "1,1 мільйона"},
 		{"2100000", "2,1 мільйона"},
 		{"3100000", "3,1 мільйона"},
 		{"4100000", "4,1 мільйона"},
 		{"5100000", "5,1 мільйона"},
-
 		{"1100000000", "1,1 мільярда"},
 		{"2100000000", "2,1 мільярда"},
 		{"3100000000", "3,1 мільярда"},
 		{"4100000000", "4,1 мільярда"},
 		{"5100000000", "5,1 мільярда"},
 		{"99900000000", "99,9 мільярда"},
-
 		{"1100000000000", "1,1 трильйона"},
 		{"2100000000000", "2,1 трильйона"},
 		{"3100000000000", "3,1 трильйона"},
@@ -68,10 +67,10 @@ func TestHumanizeUkOptionLong(t *testing.T) {
 		{"99900000000000", "99,9 трильйона"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Ukrainian)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -121,10 +120,10 @@ func TestHumanizeUkOptionShort(t *testing.T) {
 		{"99900000000000", "99,9 трлн"},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Ukrainian)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

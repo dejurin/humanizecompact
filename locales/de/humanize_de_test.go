@@ -4,11 +4,17 @@ import (
 	"testing"
 
 	hc "github.com/dejurin/humanizecompact"
+
 	locale "github.com/dejurin/humanizecompact/locales/de"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+var locales = map[string]hc.Locale{
+	"de": locale.Data,
 }
 
 func TestHumanizeDeOptionLong(t *testing.T) {
@@ -128,10 +134,10 @@ func TestHumanizeDeOptionLong(t *testing.T) {
 		{"10000000000000", "10 Billionen"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.German)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -151,13 +157,11 @@ func TestHumanizeDeOptionShort(t *testing.T) {
 		{"2000", "2000"},
 		{"3000", "3000"},
 		{"4000", "4000"},
-
 		{"10000", "10000"},
 		{"20000", "20000"},
 		{"30000", "30000"},
 		{"40000", "40000"},
 		{"50000", "50000"},
-
 		{"100000", "100000"},
 		{"200000", "200000"},
 		{"300000", "300000"},
@@ -179,7 +183,6 @@ func TestHumanizeDeOptionShort(t *testing.T) {
 		{"1900000", "1,9 Mio."},
 		{"2000000", "2 Mio."},
 		{"10000000", "10 Mio."},
-
 		{"100000000", "100 Mio."},
 		{"200000000", "200 Mio."},
 		{"300000000", "300 Mio."},
@@ -199,7 +202,6 @@ func TestHumanizeDeOptionShort(t *testing.T) {
 		{"1700000000", "1,7 Mrd."},
 		{"1800000000", "1,8 Mrd."},
 		{"1900000000", "1,9 Mrd."},
-
 		{"1000000000000", "1 Bio."},
 		{"1100000000000", "1,1 Bio."},
 		{"1200000000000", "1,2 Bio."},
@@ -210,10 +212,10 @@ func TestHumanizeDeOptionShort(t *testing.T) {
 		{"3000000000000", "3 Bio."},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.German)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

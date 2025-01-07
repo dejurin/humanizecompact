@@ -5,10 +5,15 @@ import (
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/es"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+var locales = map[string]hc.Locale{
+	"es": locale.Data,
 }
 
 func TestHumanizeEsOptionLong(t *testing.T) {
@@ -127,10 +132,10 @@ func TestHumanizeEsOptionLong(t *testing.T) {
 		{"10000000000000", "10 billones"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Spanish)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -156,21 +161,18 @@ func TestHumanizeEsOptionShort(t *testing.T) {
 		{"13000", "13 mil"},
 		{"14000", "14 mil"},
 		{"15000", "15 mil"},
-
 		{"1000000", "1 M"},
 		{"1100000", "1,1 M"},
 		{"1200000", "1,2 M"},
 		{"1300000", "1,3 M"},
 		{"1400000", "1,4 M"},
 		{"1500000", "1,5 M"},
-
 		{"10000000000", "1 mil M"},
 		{"11000000000", "1,1 mil M"},
 		{"12000000000", "1,2 mil M"},
 		{"13000000000", "1,3 mil M"},
 		{"14000000000", "1,4 mil M"},
 		{"15000000000", "1,5 mil M"},
-
 		{"1000000000000", "1 B"},
 		{"1100000000000", "1,1 B"},
 		{"1200000000000", "1,2 B"},
@@ -179,10 +181,10 @@ func TestHumanizeEsOptionShort(t *testing.T) {
 		{"1500000000000", "1,5 B"},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Spanish)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

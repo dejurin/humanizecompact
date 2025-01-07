@@ -4,11 +4,17 @@ import (
 	"testing"
 
 	hc "github.com/dejurin/humanizecompact"
-	locale "github.com/dejurin/humanizecompact/locales/ko"
+	locale "github.com/dejurin/humanizecompact/locales/ja"
+	"golang.org/x/text/language"
 )
 
 func fallback(number string) string {
 	return number
+}
+
+
+var locales = map[string]hc.Locale{
+	"ja": locale.Data,
 }
 
 func TestHumanizeJaOptionLong(t *testing.T) {
@@ -16,40 +22,28 @@ func TestHumanizeJaOptionLong(t *testing.T) {
 		number   string
 		expected string
 	}{
-		{"1000", "1천"},
-		{"2000", "2천"},
-		{"10000", "1만"},
-		{"20000", "2만"},
-		{"100000", "10만"},
-		{"1000000", "100만"},
-		{"9990000", "999만"},
-		{"10000000", "1,000만"},
-		{"1000000000000", "1조"},
-		{"1000", "1천"},
-		{"1100", "1.1천"},
-		{"2500", "2.5천"},
-		{"10000", "1만"},
-		{"11000", "1.1만"},
-		{"12500", "1.25만"},
-		{"100000", "10만"},
-		{"1000000", "100만"},
-		{"10000000", "1,000만"},
-		{"100000000", "1억"},
-		{"230000000", "2.3억"},
-		{"1000000000", "10억"},
-		{"1230000000", "12.3억"},
-		{"10000000000", "100억"},
-		{"100000000000", "1,000억"},
-		{"1000000000000", "1조"},
-		{"1100000000000", "1.1조"},
-		{"10000000000000", "10조"},
-		{"12300000000000", "12.3조"},
+		{"1000", "1000"},
+		{"2000", "2000"},
+		{"10000", "1万"},
+		{"20000", "2万"},
+		{"12345", "12345"},
+		{"100000", "10万"},
+		{"1000000", "100万"},
+		{"9990000", "999万"},
+		{"10000000", "1,000万"},
+		{"100000000", "1億"},
+		{"1000000000000", "1兆"},
+		{"10000000000000000", "1京"},
+		{"1234.5678", "1234.5678"},
+		{"100000.45", "100000.45"},
+		{"123456789.99", "123456789.99"},
+		{"1000000000000000000", "100京"},
 	}
 
-	h := hc.New(locale.Data, hc.Long, fallback)
+	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Japanese)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -65,40 +59,14 @@ func TestHumanizeJaOptionShort(t *testing.T) {
 		number   string
 		expected string
 	}{
-		{"1000", "1천"},
-		{"2000", "2천"},
-		{"10000", "1만"},
-		{"20000", "2만"},
-		{"100000", "10만"},
-		{"1000000", "100만"},
-		{"9990000", "999만"},
-		{"10000000", "1,000만"},
-		{"1000000000000", "1조"},
-		{"1000", "1천"},
-		{"1100", "1.1천"},
-		{"2500", "2.5천"},
-		{"10000", "1만"},
-		{"11000", "1.1만"},
-		{"12500", "1.25만"},
-		{"100000", "10만"},
-		{"1000000", "100만"},
-		{"10000000", "1,000만"},
-		{"100000000", "1억"},
-		{"230000000", "2.3억"},
-		{"1000000000", "10억"},
-		{"1230000000", "12.3억"},
-		{"10000000000", "100억"},
-		{"100000000000", "1,000억"},
-		{"1000000000000", "1조"},
-		{"1100000000000", "1.1조"},
-		{"10000000000000", "10조"},
-		{"12300000000000", "12.3조"},
+		{"1000", "1000"},
+		{"2000", "2000"},
 	}
 
-	h := hc.New(locale.Data, hc.Short, fallback)
+	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number)
+		res, err := h.Humanize(tt.number, language.Japanese)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

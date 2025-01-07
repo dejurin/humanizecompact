@@ -7,10 +7,11 @@ import (
 	"testing"
 
 	hc "github.com/dejurin/humanizecompact"
-	locale "github.com/dejurin/humanizecompact/locales/en"
+	locale_en "github.com/dejurin/humanizecompact/locales/en"
+
+	"golang.org/x/text/language"
 )
 
-// generateTestCases создает массив строковых чисел для тестирования.
 func generateTestCases() []string {
 	var testCases []string
 
@@ -37,7 +38,11 @@ func generateTestCases() []string {
 }
 
 func BenchmarkHumanizeGenerated(b *testing.B) {
-	h := hc.New(locale.Data, hc.Short, func(s string) string {
+	locales := map[string]hc.Locale{
+		"en": locale_en.Data,
+	}
+
+	h := hc.New(locales, hc.Short, func(s string) string {
 		return s
 	})
 
@@ -47,7 +52,7 @@ func BenchmarkHumanizeGenerated(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		for _, input := range inputs {
-			_, _ = h.Humanize(input)
+			_, _ = h.Humanize(input, language.English)
 		}
 	}
 }
