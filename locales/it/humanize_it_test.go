@@ -13,7 +13,6 @@ func fallback(number string) string {
 	return number
 }
 
-
 var locales = map[string]hc.Locale{
 	"it": locale.Data,
 }

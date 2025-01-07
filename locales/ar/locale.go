@@ -3,18 +3,19 @@ package locale
 import (
 	hc "github.com/dejurin/humanizecompact"
 	"github.com/govalues/decimal"
+	"golang.org/x/text/language"
 )
 
 type Locale struct {
 	data       hc.CldrData
-	localeCode string
+	localeCode language.Tag
 }
 
 func (l Locale) Data() hc.CldrData {
 	return l.data
 }
 
-func (l Locale) Code() string {
+func (l Locale) Code() language.Tag {
 	return l.localeCode
 }
 
@@ -58,7 +59,7 @@ func (l Locale) PluralForm(r decimal.Decimal, v string) string {
 }
 
 var Data hc.Locale = Locale{
-	localeCode: "ar",
+	localeCode: language.Arabic,
 	data: hc.CldrData{
 		Long: struct{ DecimalFormat map[string]string }{
 			DecimalFormat: map[string]string{

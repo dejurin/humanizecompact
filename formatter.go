@@ -24,7 +24,7 @@ type Locale interface {
 	PluralForm(r decimal.Decimal, v string) string
 
 	// Code returns a BCP-47 locale tag like "en", "ja", etc.
-	Code() string
+	Code() language.Tag
 }
 
 // CldrData contains the relevant decimal formats for short and long forms
@@ -70,9 +70,9 @@ func (e InvalidNumberError) Error() string {
 // more human-friendly representation (e.g., "1K") according to its
 // configured Locale, Option, and fallback strategy.
 type Humanizer struct {
-    locales  map[string]Locale
-    opt      Option
-    fallback FallbackFunc
+	locales  map[string]Locale
+	opt      Option
+	fallback FallbackFunc
 }
 
 // New returns a pointer to a new Humanizer with the given locale,
@@ -80,11 +80,11 @@ type Humanizer struct {
 // function is called whenever the input string cannot be
 // humanized (e.g., non-integer or missing CLDR data).
 func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
-    return &Humanizer{
-        locales:  locales,
-        opt:      opt,
-        fallback: fb,
-    }
+	return &Humanizer{
+		locales:  locales,
+		opt:      opt,
+		fallback: fb,
+	}
 }
 
 // Humanize attempts to produce a locale-appropriate, human-friendly
@@ -92,94 +92,95 @@ func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
 func (h *Humanizer) Humanize(value string, locale language.Tag) (string, error) {
-    locCode := locale.String()
-    loc, exists := h.locales[locCode]
-    if !exists {
-        return "", fmt.Errorf("locale %q not found", locCode)
-    }
+	locCode := locale.String()
+	loc, exists := h.locales[locCode]
+	if !exists {
+		return "", fmt.Errorf("locale %q not found", locCode)
+	}
 
-    valDec, err := decimal.Parse(value)
-    if err != nil {
-        return "", InvalidNumberError{Value: value, Err: err}
-    }
-    if !valDec.IsInt() {
-        return h.fallback(value), nil
-    }
+	valDec, err := decimal.Parse(value)
+	if err != nil {
+		return "", InvalidNumberError{Value: value, Err: err}
+	}
+	if !valDec.IsInt() {
+		return h.fallback(value), nil
+	}
 
-    var df map[string]string
-    if h.opt == Long {
-        df = loc.Data().Long.DecimalFormat
-    } else {
-        df = loc.Data().Short.DecimalFormat
-    }
-    if len(df) == 0 {
-        return h.fallback(value), nil
-    }
+	var df map[string]string
+	if h.opt == Long {
+		df = loc.Data().Long.DecimalFormat
+	} else {
+		df = loc.Data().Short.DecimalFormat
+	}
+	if len(df) == 0 {
+		return h.fallback(value), nil
+	}
 
-    groupScales := parseGroupScales(df)
-    if len(groupScales) == 0 {
-        return h.fallback(value), nil
-    }
+	groupScales := parseGroupScales(df)
+	if len(groupScales) == 0 {
+		return h.fallback(value), nil
+	}
 
-    sortedScales := sortGroupScales(groupScales)
+	sortedScales := sortGroupScales(groupScales)
 
-    one, _ := decimal.New(1, 0)
-    thousand, _ := decimal.New(1000, 0)
+	one, _ := decimal.New(1, 0)
+	thousand, _ := decimal.New(1000, 0)
 
-    var best groupScale
-    var bestRatio decimal.Decimal
+	var best groupScale
+	var bestRatio decimal.Decimal
 
-    for _, gs := range sortedScales {
-        scaleDec, _ := decimal.New(gs.scale, 0)
-        if valDec.Cmp(scaleDec) >= 0 {
-            ratio, divErr := valDec.Quo(scaleDec)
-            if divErr != nil {
-                continue
-            }
-            if ratio.Cmp(one) < 0 {
-                continue
-            }
-            if ratio.Cmp(thousand) > 0 {
-                continue
-            }
-            if !has0or1DecimalExactly(ratio, loc.Code()) {
-                continue
-            }
-            if !isAllowedRatio(ratio) {
-                continue
-            }
-            if bestRatio.IsZero() || ratio.Cmp(bestRatio) == -1 {
-                best = gs
-                bestRatio = ratio
-            }
-        }
-    }
+	for _, gs := range sortedScales {
+		scaleDec, _ := decimal.New(gs.scale, 0)
+		if valDec.Cmp(scaleDec) >= 0 {
+			ratio, divErr := valDec.Quo(scaleDec)
+			if divErr != nil {
+				continue
+			}
+			if ratio.Cmp(one) < 0 {
+				continue
+			}
+			if ratio.Cmp(thousand) > 0 {
+				continue
+			}
+			if !has0or1DecimalExactly(ratio, loc.Code()) {
+				continue
+			}
+			if !isAllowedRatio(ratio) {
+				continue
+			}
+			if bestRatio.IsZero() || ratio.Cmp(bestRatio) == -1 {
+				best = gs
+				bestRatio = ratio
+			}
+		}
+	}
 
-    if bestRatio.IsZero() {
-        return h.fallback(value), nil
-    }
+	if bestRatio.IsZero() {
+		return h.fallback(value), nil
+	}
 
-    pluralForm := loc.PluralForm(bestRatio, value)
-    key := fmt.Sprintf("%d-count-%s", best.scale, pluralForm)
-    tmpl := df[key]
+	pluralForm := loc.PluralForm(bestRatio, value)
+	key := fmt.Sprintf("%d-count-%s", best.scale, pluralForm)
+	tmpl := df[key]
 
-    if tmpl == "" && pluralForm != "other" {
-        altKey := fmt.Sprintf("%d-count-other", best.scale)
-        altTmpl := df[altKey]
-        if altTmpl != "" {
-            tmpl = altTmpl
-        }
-    }
+	if tmpl == "" && pluralForm != "other" {
+		altKey := fmt.Sprintf("%d-count-other", best.scale)
+		altTmpl := df[altKey]
+		if altTmpl != "" {
+			tmpl = altTmpl
+		}
+	}
 
-    if tmpl == "" {
-        return h.fallback(value), nil
-    }
+	if tmpl == "" {
+		return h.fallback(value), nil
+	}
 
-    p := message.NewPrinter(locale)
-    floatVal, _ := bestRatio.Float64()
+	p := message.NewPrinter(locale)
+	floatVal, _ := bestRatio.Float64()
 
-    return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), nil
+	return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), nil
 }
+
 // groupScale is an internal struct for capturing a scale name
 // (e.g. "thousand") and its integer-based scale factor (e.g. 1000).
 type groupScale struct {
@@ -232,9 +233,9 @@ func extractName(s string) string {
 
 // has0or1DecimalExactly checks if the given decimal has exactly zero
 // or one decimal place, depending on certain locale constraints.
-func has0or1DecimalExactly(d decimal.Decimal, localeCode string) bool {
+func has0or1DecimalExactly(d decimal.Decimal, localeCode language.Tag) bool {
 	// Some East Asian locales require slightly different logic.
-	if localeCode != "ja" && localeCode != "ko" {
+	if localeCode.String() != "ja" && localeCode.String() != "ko" {
 		t1 := d.Trunc(1)
 		if d.Equal(t1) {
 			return true
