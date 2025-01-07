@@ -91,19 +91,19 @@ func New(locales map[language.Tag]Locale, opt Option, fb FallbackFunc) *Humanize
 // version of the given numeric string. If the string cannot be parsed
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
-func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error) {
+func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, error) {
 	locCode := locale
 	loc, exists := h.locales[locCode]
 	if !exists {
-		return "", fmt.Errorf("locale %q not found", locCode)
+		return "", false, fmt.Errorf("locale %q not found", locCode)
 	}
 
 	valDec, err := decimal.Parse(value)
 	if err != nil {
-		return "", InvalidNumberError{Value: value, Err: err}
+		return "", false, InvalidNumberError{Value: value, Err: err}
 	}
 	if !valDec.IsInt() {
-		return h.fallback(value), nil
+		return h.fallback(value), true, nil
 	}
 
 	var df map[string]string
@@ -113,12 +113,12 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error)
 		df = loc.Data().Short.DecimalFormat
 	}
 	if len(df) == 0 {
-		return h.fallback(value), nil
+		return h.fallback(value), true, nil
 	}
 
 	groupScales := parseGroupScales(df)
 	if len(groupScales) == 0 {
-		return h.fallback(value), nil
+		return h.fallback(value), true, nil
 	}
 
 	sortedScales := sortGroupScales(groupScales)
@@ -156,7 +156,7 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error)
 	}
 
 	if bestRatio.IsZero() {
-		return h.fallback(value), nil
+		return h.fallback(value), true, nil
 	}
 
 	pluralForm := loc.PluralForm(bestRatio, value)
@@ -172,13 +172,13 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error)
 	}
 
 	if tmpl == "" {
-		return h.fallback(value), nil
+		return h.fallback(value), true, nil
 	}
 
 	p := message.NewPrinter(locale)
 	floatVal, _ := bestRatio.Float64()
 
-	return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), nil
+	return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), false, nil
 }
 
 // groupScale is an internal struct for capturing a scale name
@@ -256,10 +256,7 @@ func isAllowedRatio(r decimal.Decimal) bool {
 	}
 	floor := r.Floor(0)
 	hundred, _ := decimal.New(100, 0)
-	if floor.Cmp(hundred) >= 0 {
-		return false
-	}
-	return true
+	return floor.Cmp(hundred) < 0
 }
 
 // replacePlaceholder replaces the first occurrence of "000", "00", or "0"

@@ -9,25 +9,25 @@ import (
 )
 
 func main() {
-    var locales = map[language.Tag]hc.Locale{
-        language.English: locale.Data,
-    }
-    humanizer := hc.New(
-        locales,
-        hc.Long,
-        func(original string) string {
-            return original
-        },
-    )
+	var locales = map[language.Tag]hc.Locale{
+		language.English: locale.Data,
+	}
+	humanizer := hc.New(
+		locales,
+		hc.Long,
+		func(original string) string {
+			return original
+		},
+	)
 
-    values := []string{"999", "1000", "10000", "1500000", "0.75", "1000000000000"}
+	values := []string{"999", "1000", "10000", "1500000", "0.75", "1000000000000"}
 
-    for _, val := range values {
-        out, err := humanizer.Formatter(val, language.English)
-        if err != nil {
-            fmt.Printf("[ERROR] val=%q: %v\n", val, err)
-            continue
-        }
-        fmt.Printf("val=%-15s => %s\n", val, out)
-    }
+	for _, val := range values {
+		out, _, err := humanizer.Formatter(val, language.English)
+		if err != nil {
+			fmt.Printf("[ERROR] val=%q: %v\n", val, err)
+			continue
+		}
+		fmt.Printf("val=%-15s => %s\n", val, out)
+	}
 }

@@ -54,7 +54,7 @@ func TestHumanizeKoOptionLong(t *testing.T) {
 	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Formatter(tt.number, language.Korean)
+		res, _, err := h.Formatter(tt.number, language.Korean)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -103,7 +103,7 @@ func TestHumanizeKoOptionShort(t *testing.T) {
 	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Formatter(tt.number, language.Korean)
+		res, _, err := h.Formatter(tt.number, language.Korean)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

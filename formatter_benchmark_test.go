@@ -52,7 +52,7 @@ func BenchmarkHumanizeGenerated(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		for _, input := range inputs {
-			_, _ = h.Formatter(input, language.English)
+			_, _, _ = h.Formatter(input, language.English)
 		}
 	}
 }
