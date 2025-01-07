@@ -128,7 +128,7 @@ func TestHumanizeIdOptionLong(t *testing.T) {
 		{"10000000000000", "10 triliun"},
 	}
 
-	h := humanize.NewHumanizer(locale.Data, humanize.OptionLong, fallback)
+	h := humanize.New(locale.Data, humanize.Long, fallback)
 
 	for _, tt := range tests {
 		res, err := h.Humanize(tt.number)
@@ -175,7 +175,7 @@ func TestHumanizeIdOptionShort(t *testing.T) {
 		{"999000000", "999 jt"},
 	}
 
-	h := humanize.NewHumanizer(locale.Data, humanize.OptionShort, fallback)
+	h := humanize.New(locale.Data, humanize.Short, fallback)
 
 	for _, tt := range tests {
 		res, err := h.Humanize(tt.number)
