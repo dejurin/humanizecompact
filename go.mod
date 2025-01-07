@@ -4,5 +4,5 @@ go 1.23
 
 require (
 	github.com/govalues/decimal v0.1.34
-	golang.org/x/text v0.3.7
+	golang.org/x/text v0.21.0
 )
