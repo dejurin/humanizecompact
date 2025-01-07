@@ -186,20 +186,18 @@ type groupScale struct {
 func parseGroupScales(df map[string]string) map[string]decimal.Decimal {
 	nameToMin := make(map[string]decimal.Decimal)
 	for k, tmpl := range df {
-		parts := strings.Split(k, "-count-")
-		if len(parts) != 2 {
+		scaleStr := strings.SplitN(k, "-count-", 2)[0]
+		scaleVal, err := decimal.Parse(scaleStr)
+		if err != nil {
 			continue
 		}
-		scaleStr := parts[0]
-		scaleVal := decimal.MustParse(scaleStr)
 
 		gname := extractName(tmpl)
 		if gname == "" {
 			continue
 		}
 
-		old, ok := nameToMin[gname]
-		if !ok || scaleVal.Cmp(old) == -1 {
+		if old, ok := nameToMin[gname]; !ok || scaleVal.Cmp(old) == -1 {
 			nameToMin[gname] = scaleVal
 		}
 	}

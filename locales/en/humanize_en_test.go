@@ -16,6 +16,7 @@ func TestHumanizeEnOptionLong(t *testing.T) {
 		number   string
 		expected string
 	}{
+		{"-1000", "-1000"},                     // fallback
 		{"1", "1"},                         // fallback
 		{"9999", "9999"},                   // fallback
 		{"100100", "100100"},               // fallback
@@ -126,6 +127,7 @@ func TestHumanizeEnOptionLong(t *testing.T) {
 		{"8000000000000", "8 trillion"},
 		{"9000000000000", "9 trillion"},
 		{"10000000000000", "10 trillion"},
+		{"99999999999999999", "99999999999999999"},
 	}
 
 	h := hc.New(locale.Data, hc.Long, fallback)

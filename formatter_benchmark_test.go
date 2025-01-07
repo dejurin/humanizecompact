@@ -1,87 +1,53 @@
 package humanizecompact_test
 
 import (
+	"fmt"
+	"math"
+	"math/rand"
 	"testing"
 
 	hc "github.com/dejurin/humanizecompact"
 	locale "github.com/dejurin/humanizecompact/locales/en"
 )
 
-func BenchmarkHumanize(b *testing.B) {
-    h := hc.New(locale.Data, hc.Short, func(s string) string {
-        return s
-    })
+// generateTestCases создает массив строковых чисел для тестирования.
+func generateTestCases() []string {
+	var testCases []string
 
-    inputs := []string{
-		"0.0000000001",
-        "0.5",
-		"1.5",
-        "999",
-        "1000",
-        "123456",
-		"1234.5",
-		"1234.5678",
-		"100000000",
-		"200000000",
-		"300000000",
-		"400000000",
-		"450000000",
-		"500000000",
-		"550000000",
-		"600000000",
-		"650000000",
-		"700000000",
-		"750000000",
-		"800000000",
-		"850000000",
-		"900000000",
-		"950000000",
-		"1000000000",
-		"1100000000",
-		"1200000000",
-		"1300000000",
-		"1400000000",
-		"1500000000",
-		"1600000000",
-		"1700000000",
-		"1800000000",
-		"1900000000",
-		"2000000000",
-		"2100000000",
-		"2110000000",
-		"2120000000",
-		"2130000000",
-		"2140000000",
-		"10000000000",
-		"99900000000",
-		"100000000000",
-		"999000000000",
-		"1000000000000",
-		"9990000000000",
-		"10000000000000",
-		"99900000000000",
-        "999999999999999",
-		"100000000000000",
-		"999000000000000",
-		"1000000000000000",
-		"9990000000000000",
-		"10000000000000000",
-		"99900000000000000",
-		"100000000000000000",
-		"999000000000000000",
-		"1000000000000000000",
-		"9990000000000000000",
-		"10000000000000000000",
-		"99900000000000000000",
-		"100000000000000000000",
-		"999000000000000000000",
-    }
+	for i := -1000; i <= 1000; i++ {
+		testCases = append(testCases, fmt.Sprintf("%d", i))
+	}
 
-    b.ResetTimer()
+	for i := -1000; i <= 1000; i++ {
+		testCases = append(testCases, fmt.Sprintf("%.6f", float64(i)/10))
+	}
 
-    for i := 0; i < b.N; i++ {
-        for _, input := range inputs {
-            _, _ = h.Humanize(input)
-        }
-    }
+	for exp := 1; exp <= 200; exp++ {
+		value := int64(math.Pow10(exp))
+		testCases = append(testCases, fmt.Sprintf("%d", value))
+		testCases = append(testCases, fmt.Sprintf("%d", -value))
+	}
+
+	for i := 0; i < 100000; i++ {
+		randomValue := rand.Float64() * math.Pow10(rand.Intn(20))
+		testCases = append(testCases, fmt.Sprintf("%.6f", randomValue))
+	}
+
+	return testCases
+}
+
+func BenchmarkHumanizeGenerated(b *testing.B) {
+	h := hc.New(locale.Data, hc.Short, func(s string) string {
+		return s
+	})
+
+	inputs := generateTestCases()
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		for _, input := range inputs {
+			_, _ = h.Humanize(input)
+		}
+	}
 }
