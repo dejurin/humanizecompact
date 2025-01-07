@@ -91,7 +91,7 @@ func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
 // version of the given numeric string. If the string cannot be parsed
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
-func (h *Humanizer) Humanize(value string, locale language.Tag) (string, error) {
+func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error) {
 	locCode := locale.String()
 	loc, exists := h.locales[locCode]
 	if !exists {

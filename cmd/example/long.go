@@ -23,7 +23,7 @@ func main() {
     values := []string{"999", "1000", "10000", "1500000", "0.75", "1000000000000"}
 
     for _, val := range values {
-        out, err := humanizer.Humanize(val, language.English)
+        out, err := humanizer.Formatter(val, language.English)
         if err != nil {
             fmt.Printf("[ERROR] val=%q: %v\n", val, err)
             continue

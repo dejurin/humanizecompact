@@ -69,7 +69,7 @@ func TestHumanizeUkOptionLong(t *testing.T) {
 	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number, language.Ukrainian)
+		res, err := h.Formatter(tt.number, language.Ukrainian)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -122,7 +122,7 @@ func TestHumanizeUkOptionShort(t *testing.T) {
 	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number, language.Ukrainian)
+		res, err := h.Formatter(tt.number, language.Ukrainian)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue

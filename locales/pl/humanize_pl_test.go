@@ -120,7 +120,7 @@ func TestHumanizePlOptionLong(t *testing.T) {
 	h := hc.New(locales, hc.Long, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number, language.Polish)
+		res, err := h.Formatter(tt.number, language.Polish)
 		if err != nil {
 			t.Errorf("number %q => unexpected error: %v", tt.number, err)
 			continue
@@ -216,7 +216,7 @@ func TestHumanizePlOptionShort(t *testing.T) {
 	h := hc.New(locales, hc.Short, fallback)
 
 	for _, tt := range tests {
-		res, err := h.Humanize(tt.number, language.Polish)
+		res, err := h.Formatter(tt.number, language.Polish)
 		if err != nil {
 			t.Errorf("[SHORT] number %q => unexpected error: %v", tt.number, err)
 			continue
