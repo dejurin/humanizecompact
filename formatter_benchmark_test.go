@@ -22,7 +22,7 @@ func generateTestCases() []string {
 		testCases = append(testCases, fmt.Sprintf("%.6f", float64(i)/10))
 	}
 
-	for exp := 1; exp <= 200; exp++ {
+	for exp := 1; exp <= 1000; exp++ {
 		value := int64(math.Pow10(exp))
 		testCases = append(testCases, fmt.Sprintf("%d", value))
 		testCases = append(testCases, fmt.Sprintf("%d", -value))
