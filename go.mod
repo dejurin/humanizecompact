@@ -1,4 +1,4 @@
-module github.com/dejurin/humanize-cldr
+module github.com/dejurin/humanizecompact
 
 go 1.23.3
 

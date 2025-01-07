@@ -1,24 +1,24 @@
-package humanize_test
+package humanizecompact_test
 
 import (
 	"testing"
 
-	"github.com/dejurin/humanize-cldr"
-	locale "github.com/dejurin/humanize-cldr/locales/en"
+	hc "github.com/dejurin/humanizecompact"
+	locale "github.com/dejurin/humanizecompact/locales/en"
 )
 
 func BenchmarkHumanize(b *testing.B) {
-    h := humanize.New(locale.Data, humanize.Short, func(s string) string {
+    h := hc.New(locale.Data, hc.Short, func(s string) string {
         return s
     })
 
     inputs := []string{
+		"0.0000000001",
+        "0.5",
+		"1.5",
         "999",
         "1000",
         "123456",
-        "999999999999999",
-        "0.5",
-		"1.5",
 		"1234.5",
 		"1234.5678",
 		"100000000",
@@ -36,7 +36,6 @@ func BenchmarkHumanize(b *testing.B) {
 		"850000000",
 		"900000000",
 		"950000000",
-
 		"1000000000",
 		"1100000000",
 		"1200000000",
@@ -61,6 +60,7 @@ func BenchmarkHumanize(b *testing.B) {
 		"9990000000000",
 		"10000000000000",
 		"99900000000000",
+        "999999999999999",
 		"100000000000000",
 		"999000000000000",
 		"1000000000000000",

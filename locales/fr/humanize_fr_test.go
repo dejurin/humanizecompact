@@ -3,8 +3,8 @@ package locale_test
 import (
 	"testing"
 
-	humanize "github.com/dejurin/humanize-cldr"
-	locale "github.com/dejurin/humanize-cldr/locales/fr"
+	hc "github.com/dejurin/humanizecompact"
+	locale "github.com/dejurin/humanizecompact/locales/fr"
 )
 
 func fallback(number string) string {
@@ -111,7 +111,7 @@ func TestHumanizeFrOptionLong(t *testing.T) {
 		{"10000000000000", "10 billions"},
 	}
 
-	h := humanize.New(locale.Data, humanize.Long, fallback)
+	h := hc.New(locale.Data, hc.Long, fallback)
 
 	for _, tt := range tests {
 		res, err := h.Humanize(tt.number)
@@ -164,7 +164,7 @@ func TestHumanizeFrOptionShort(t *testing.T) {
 		{"99900000000000", "99,9 Bn"},
 	}
 
-	h := humanize.New(locale.Data, humanize.Short, fallback)
+	h := hc.New(locale.Data, hc.Short, fallback)
 
 	for _, tt := range tests {
 		res, err := h.Humanize(tt.number)

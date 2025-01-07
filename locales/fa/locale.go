@@ -1,16 +1,16 @@
 package locale
 
 import (
-	humanize "github.com/dejurin/humanize-cldr"
+	hc "github.com/dejurin/humanizecompact"
 	"github.com/govalues/decimal"
 )
 
 type Locale struct {
-	data       humanize.CldrData
+	data       hc.CldrData
 	localeCode string
 }
 
-func (l Locale) Data() humanize.CldrData {
+func (l Locale) Data() hc.CldrData {
 	return l.data
 }
 
@@ -42,9 +42,9 @@ func (l Locale) PluralForm(r decimal.Decimal, v string) string {
 	return "other"
 }
 
-var Data humanize.Locale = Locale{
+var Data hc.Locale = Locale{
 	localeCode: "fa",
-	data: humanize.CldrData{
+	data: hc.CldrData{
 		Long: struct{ DecimalFormat map[string]string }{
 			DecimalFormat: map[string]string{
 				"1000-count-one":              "0 هزار",

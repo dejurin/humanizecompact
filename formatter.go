@@ -1,6 +1,6 @@
 // Package humanize provides functionality for converting numeric strings into
 // more human-friendly representations according to CLDR data and locale rules.
-package humanize
+package humanizecompact
 
 import (
 	"fmt"
