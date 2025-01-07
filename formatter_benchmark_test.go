@@ -38,8 +38,8 @@ func generateTestCases() []string {
 }
 
 func BenchmarkHumanizeGenerated(b *testing.B) {
-	locales := map[string]hc.Locale{
-		"en": locale_en.Data,
+	locales := map[language.Tag]hc.Locale{
+		language.English: locale_en.Data,
 	}
 
 	h := hc.New(locales, hc.Short, func(s string) string {

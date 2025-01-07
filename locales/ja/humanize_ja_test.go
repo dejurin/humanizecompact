@@ -12,8 +12,8 @@ func fallback(number string) string {
 	return number
 }
 
-var locales = map[string]hc.Locale{
-	"ja": locale.Data,
+var locales = map[language.Tag]hc.Locale{
+	language.Japanese: locale.Data,
 }
 
 func TestHumanizeJaOptionLong(t *testing.T) {

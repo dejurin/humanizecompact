@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-    var locales = map[string]hc.Locale{
-        "en": locale.Data,
+    var locales = map[language.Tag]hc.Locale{
+        language.English: locale.Data,
     }
     humanizer := hc.New(
         locales,

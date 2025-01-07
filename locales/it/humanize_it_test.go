@@ -13,8 +13,8 @@ func fallback(number string) string {
 	return number
 }
 
-var locales = map[string]hc.Locale{
-	"it": locale.Data,
+var locales = map[language.Tag]hc.Locale{
+	language.Italian: locale.Data,
 }
 
 func TestHumanizeItOptionLong(t *testing.T) {

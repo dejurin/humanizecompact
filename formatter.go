@@ -70,7 +70,7 @@ func (e InvalidNumberError) Error() string {
 // more human-friendly representation (e.g., "1K") according to its
 // configured Locale, Option, and fallback strategy.
 type Humanizer struct {
-	locales  map[string]Locale
+	locales  map[language.Tag]Locale
 	opt      Option
 	fallback FallbackFunc
 }
@@ -79,7 +79,7 @@ type Humanizer struct {
 // form option (long or short), and fallback function. The fallback
 // function is called whenever the input string cannot be
 // humanized (e.g., non-integer or missing CLDR data).
-func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
+func New(locales map[language.Tag]Locale, opt Option, fb FallbackFunc) *Humanizer {
 	return &Humanizer{
 		locales:  locales,
 		opt:      opt,
@@ -92,7 +92,7 @@ func New(locales map[string]Locale, opt Option, fb FallbackFunc) *Humanizer {
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
 func (h *Humanizer) Formatter(value string, locale language.Tag) (string, error) {
-	locCode := locale.String()
+	locCode := locale
 	loc, exists := h.locales[locCode]
 	if !exists {
 		return "", fmt.Errorf("locale %q not found", locCode)
