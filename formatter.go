@@ -191,40 +191,40 @@ type groupScale struct {
 // cutCountSuffix removes the "-count-" suffix from a key, returning
 // the prefix and a boolean indicating whether the suffix was found.
 func cutCountSuffix(k string) (prefix string, ok bool) {
-    idx := strings.Index(k, "-count-")
-    if idx < 0 {
-        return k, false
-    }
-    return k[:idx], true
+	idx := strings.Index(k, "-count-")
+	if idx < 0 {
+		return k, false
+	}
+	return k[:idx], true
 }
 
 // parseGroupScales generates a map of group scales (e.g. "thousand" => 1000)
 // from the CLDR data.
 func parseGroupScales(df map[string]string) map[string]decimal.Decimal {
-    nameToMin := make(map[string]decimal.Decimal)
+	nameToMin := make(map[string]decimal.Decimal)
 
-    for k, tmpl := range df {
-        prefix, found := cutCountSuffix(k)
-        if !found {
-            continue
-        }
+	for k, tmpl := range df {
+		prefix, found := cutCountSuffix(k)
+		if !found {
+			continue
+		}
 
-        scaleVal, err := decimal.Parse(prefix)
-        if err != nil {
-            continue
-        }
+		scaleVal, err := decimal.Parse(prefix)
+		if err != nil {
+			continue
+		}
 
-        gname := extractName(tmpl)
-        if gname == "" {
-            continue
-        }
+		gname := extractName(tmpl)
+		if gname == "" {
+			continue
+		}
 
-        if old, ok := nameToMin[gname]; !ok || scaleVal.Cmp(old) < 0 {
-            nameToMin[gname] = scaleVal
-        }
-    }
+		if old, ok := nameToMin[gname]; !ok || scaleVal.Cmp(old) < 0 {
+			nameToMin[gname] = scaleVal
+		}
+	}
 
-    return nameToMin
+	return nameToMin
 }
 
 // sortGroupScales converts the map of group scales to a slice, then sorts
