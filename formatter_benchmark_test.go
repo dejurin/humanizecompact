@@ -1,3 +1,7 @@
+// go test -bench=BenchmarkHumanizeGenerated -benchmem -cpuprofile cpu.prof -memprofile mem.prof
+// go tool pprof -http=:8080 cpu.prof
+// go tool pprof -http=:8081 mem.prof
+
 package humanizecompact_test
 
 import (
@@ -6,10 +10,10 @@ import (
 	"math/rand"
 	"testing"
 
+	"golang.org/x/text/language"
+
 	hc "github.com/dejurin/humanizecompact"
 	locale_en "github.com/dejurin/humanizecompact/locales/en"
-
-	"golang.org/x/text/language"
 )
 
 func generateTestCases() []string {
