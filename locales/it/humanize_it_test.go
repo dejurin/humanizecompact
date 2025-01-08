@@ -3,10 +3,10 @@ package locale_test
 import (
 	"testing"
 
-	hc "github.com/dejurin/humanizecompact"
-
-	locale "github.com/dejurin/humanizecompact/locales/it"
 	"golang.org/x/text/language"
+
+	hc "github.com/dejurin/humanizecompact"
+	locale "github.com/dejurin/humanizecompact/locales/it"
 )
 
 func fallback(number string) string {
@@ -163,10 +163,10 @@ func TestHumanizeItOptionShort(t *testing.T) {
 		{"13000", "13000"},
 		{"14000", "14000"},
 		{"15000", "15000"},
-		{"1000000", "1 Mln"},
-		{"10100000", "10,1 Mln"},
-		{"1100000", "1,1 Mln"},
-		{"1200000", "1,2 Mln"},
+		{"1000000", "1\u00A0Mln"},
+		{"10100000", "10,1\u00A0Mln"},
+		{"1100000", "1,1\u00A0Mln"},
+		{"1200000", "1,2\u00A0Mln"},
 	}
 
 	h := hc.New(locales, hc.Short, fallback)

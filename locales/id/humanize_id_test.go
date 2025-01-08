@@ -3,10 +3,10 @@ package locale_test
 import (
 	"testing"
 
-	hc "github.com/dejurin/humanizecompact"
-
-	locale "github.com/dejurin/humanizecompact/locales/id"
 	"golang.org/x/text/language"
+
+	hc "github.com/dejurin/humanizecompact"
+	locale "github.com/dejurin/humanizecompact/locales/id"
 )
 
 func fallback(number string) string {
@@ -153,32 +153,32 @@ func TestHumanizeIdOptionShort(t *testing.T) {
 		number   string
 		expected string
 	}{
-		{"1000", "1 rb"},
-		{"2000", "2 rb"},
-		{"3000", "3 rb"},
-		{"4000", "4 rb"},
-		{"5000", "5 rb"},
-		{"11000", "11 rb"},
-		{"12000", "12 rb"},
-		{"13000", "13 rb"},
-		{"14000", "14 rb"},
-		{"15000", "15 rb"},
-		{"11100", "11,1 rb"},
-		{"12100", "12,1 rb"},
-		{"13100", "13,1 rb"},
-		{"14100", "14,1 rb"},
-		{"15100", "15,1 rb"},
-		{"10000", "10 rb"},
-		{"12500", "12,5 rb"},
-		{"15000", "15 rb"},
-		{"15100", "15,1 rb"},
-		{"99500", "99,5 rb"},
-		{"1000000", "1 jt"},
-		{"10100000", "10,1 jt"},
-		{"99900000", "99,9 jt"},
-		{"100000000", "100 jt"},
-		{"101000000", "101 jt"},
-		{"999000000", "999 jt"},
+		{"1000", "1\u00A0rb"},
+		{"2000", "2\u00A0rb"},
+		{"3000", "3\u00A0rb"},
+		{"4000", "4\u00A0rb"},
+		{"5000", "5\u00A0rb"},
+		{"11000", "11\u00A0rb"},
+		{"12000", "12\u00A0rb"},
+		{"13000", "13\u00A0rb"},
+		{"14000", "14\u00A0rb"},
+		{"15000", "15\u00A0rb"},
+		{"11100", "11,1\u00A0rb"},
+		{"12100", "12,1\u00A0rb"},
+		{"13100", "13,1\u00A0rb"},
+		{"14100", "14,1\u00A0rb"},
+		{"15100", "15,1\u00A0rb"},
+		{"10000", "10\u00A0rb"},
+		{"12500", "12,5\u00A0rb"},
+		{"15000", "15\u00A0rb"},
+		{"15100", "15,1\u00A0rb"},
+		{"99500", "99,5\u00A0rb"},
+		{"1000000", "1\u00A0jt"},
+		{"10100000", "10,1\u00A0jt"},
+		{"99900000", "99,9\u00A0jt"},
+		{"100000000", "100\u00A0jt"},
+		{"101000000", "101\u00A0jt"},
+		{"999000000", "999\u00A0jt"},
 	}
 
 	h := hc.New(locales, hc.Short, fallback)
