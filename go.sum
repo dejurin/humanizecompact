@@ -1,4 +1,4 @@
-github.com/govalues/decimal v0.1.34 h1:I6h+yswn/g8IqWBcfr4z6LrT48Ar6zioIbQtIjljnBk=
-github.com/govalues/decimal v0.1.34/go.mod h1:Ee7eI3Llf7hfqDZtpj8Q6NCIgJy1iY3kH1pSwDrNqlM=
+github.com/govalues/decimal v0.1.33 h1:OoLFgtSrAK+Xttmv5ULVobriuoSKC/gyQjAqBjQqJE4=
+github.com/govalues/decimal v0.1.33/go.mod h1:Ee7eI3Llf7hfqDZtpj8Q6NCIgJy1iY3kH1pSwDrNqlM=
 golang.org/x/text v0.21.0 h1:zyQAAkrwaneQ066sspRyJaG9VNi/YJ1NfzcGB3hZ/qo=
 golang.org/x/text v0.21.0/go.mod h1:4IBbMaMmOPCJ8SecivzSH54+73PCFmPWxNTLm+vZkEQ=
