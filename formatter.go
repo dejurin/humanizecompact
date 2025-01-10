@@ -104,11 +104,11 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, 
 		return "", false, InvalidNumberError{Value: value, Err: err}
 	}
 
-	return h.FormatAmount(valDec, locale)
+	return h.FormatDecimal(valDec, locale)
 
 }
 
-func (h *Humanizer) FormatAmount(valueDec decimal.Decimal, locale language.Tag) (string, bool, error) {
+func (h *Humanizer) FormatDecimal(valueDec decimal.Decimal, locale language.Tag) (string, bool, error) {
 	locCode := locale
 	loc, exists := h.locales[locCode]
 	if !exists {
