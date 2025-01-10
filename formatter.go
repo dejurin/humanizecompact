@@ -61,6 +61,13 @@ type InvalidNumberError struct {
 	Err   error
 }
 
+// groupScale is an internal struct for capturing a scale name
+// (e.g. "thousand") and its integer-based scale factor (e.g. 1000).
+type groupScale struct {
+	name  string
+	scale int64
+}
+
 // Error implements the error interface.
 func (e InvalidNumberError) Error() string {
 	return fmt.Sprintf("invalid number %q: %v", e.Value, e.Err)
@@ -92,18 +99,26 @@ func New(locales map[language.Tag]Locale, opt Option, fb FallbackFunc) *Humanize
 // as a decimal integer or the available data is insufficient, the
 // configured fallback function is used instead.
 func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, error) {
+	valDec, err := decimal.Parse(value)
+	if err != nil {
+		return "", false, InvalidNumberError{Value: value, Err: err}
+	}
+
+	return h.FormatAmount(valDec, locale)
+
+}
+
+func (h *Humanizer) FormatAmount(valueDec decimal.Decimal, locale language.Tag) (string, bool, error) {
 	locCode := locale
 	loc, exists := h.locales[locCode]
 	if !exists {
 		return "", false, fmt.Errorf("locale %q not found", locCode)
 	}
 
-	valDec, err := decimal.Parse(value)
-	if err != nil {
-		return "", false, InvalidNumberError{Value: value, Err: err}
-	}
-	if !valDec.IsInt() {
-		return h.fallback(value), true, nil
+	valueStr := valueDec.String()
+
+	if !valueDec.IsInt() {
+		return h.fallback(valueStr), true, nil
 	}
 
 	var df map[string]string
@@ -113,12 +128,12 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, 
 		df = loc.Data().Short.DecimalFormat
 	}
 	if len(df) == 0 {
-		return h.fallback(value), true, nil
+		return h.fallback(valueStr), true, nil
 	}
 
 	groupScales := parseGroupScales(df)
 	if len(groupScales) == 0 {
-		return h.fallback(value), true, nil
+		return h.fallback(valueStr), true, nil
 	}
 
 	sortedScales := sortGroupScales(groupScales)
@@ -131,8 +146,8 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, 
 
 	for _, gs := range sortedScales {
 		scaleDec, _ := decimal.New(gs.scale, 0)
-		if valDec.Cmp(scaleDec) >= 0 {
-			ratio, divErr := valDec.Quo(scaleDec)
+		if valueDec.Cmp(scaleDec) >= 0 {
+			ratio, divErr := valueDec.Quo(scaleDec)
 			if divErr != nil {
 				continue
 			}
@@ -156,10 +171,10 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, 
 	}
 
 	if bestRatio.IsZero() {
-		return h.fallback(value), true, nil
+		return h.fallback(valueStr), true, nil
 	}
 
-	pluralForm := loc.PluralForm(bestRatio, value)
+	pluralForm := loc.PluralForm(bestRatio, valueStr)
 	key := fmt.Sprintf("%d-count-%s", best.scale, pluralForm)
 	tmpl := df[key]
 
@@ -172,20 +187,13 @@ func (h *Humanizer) Formatter(value string, locale language.Tag) (string, bool, 
 	}
 
 	if tmpl == "" {
-		return h.fallback(value), true, nil
+		return h.fallback(valueStr), true, nil
 	}
 
 	p := message.NewPrinter(locale)
 	floatVal, _ := bestRatio.Float64()
 
 	return replacePlaceholder(tmpl, p.Sprintf("%v", floatVal)), false, nil
-}
-
-// groupScale is an internal struct for capturing a scale name
-// (e.g. "thousand") and its integer-based scale factor (e.g. 1000).
-type groupScale struct {
-	name  string
-	scale int64
 }
 
 // cutCountSuffix removes the "-count-" suffix from a key, returning
